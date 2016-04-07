@@ -84,19 +84,20 @@ func proxy(w http.ResponseWriter, r *http.Request) {
 	}
 	copyHeaders(newReq.Header, r.Header)
 
-	cert, err = loadX509KeyPair(*destCertFlag, *destKeyFlag, *destKeyPassFlag)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "Error: %s!", err.Error())
-		return
+	tlsClientConfig := tls.Config{InsecureSkipVerify: true}
+
+	if (*destCertFlag) != "" {
+		cert, err = loadX509KeyPair(*destCertFlag, *destKeyFlag, *destKeyPassFlag)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprintf(w, "Error: %s!", err.Error())
+			return
+		}
+		tlsClientConfig.Certificates = []tls.Certificate{cert}
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true,
-			//RootCAs: roots,
-			Certificates: []tls.Certificate{cert},
-		},
-	}
+	tr := &http.Transport{TLSClientConfig: &tlsClientConfig}
+
 	client := &http.Client{Transport: tr}
 
 	newResp, err = client.Do(newReq)
