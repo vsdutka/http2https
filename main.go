@@ -5,12 +5,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/kardianos/service"
-	_ "golang.org/x/tools/go/ssa"
 	"log"
 	"os"
 	"runtime"
 	"sync"
+
+	"github.com/kardianos/service"
+	_ "golang.org/x/tools/go/ssa"
 )
 
 var (
@@ -26,6 +27,7 @@ var (
 	destKeyPassFlag     *string
 	confServiceName     string
 	confServiceDispName string
+	debugFlag           *bool
 )
 
 func logInfof(format string, a ...interface{}) error {
@@ -100,6 +102,7 @@ func main() {
 	destCertFlag = flag.String("dest_cert", "", "Destination certificate file name")
 	destKeyFlag = flag.String("dest_key", "", "Destination key file name")
 	destKeyPassFlag = flag.String("dest_key_pass", "", "Destination key password")
+	debugFlag = flag.Bool("debug", false, "Dump request/response")
 	flag.Parse()
 
 	if *verFlag == true {

@@ -2,13 +2,14 @@
 package main
 
 import (
-	"github.com/kardianos/osext"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/kardianos/osext"
 )
 
 type statusWriter struct {
@@ -31,6 +32,7 @@ func (w *statusWriter) Write(b []byte) (int, error) {
 }
 
 var logChan = make(chan string, 10000)
+var basePath string
 
 func init() {
 	go func() {
@@ -47,7 +49,7 @@ func init() {
 			}
 		}()
 
-		basePath := ""
+		basePath = ""
 		exeName, err := osext.Executable()
 
 		if err == nil {

@@ -67,8 +67,16 @@ func stopServer() {
 }
 
 func proxy(w http.ResponseWriter, r *http.Request) {
-	newURL := fmt.Sprintf("https://%s:%v%s", *destHostFlag, *destPortFlag, r.URL.Path+"?"+r.URL.RawQuery)
+	newURL := "https://" + *destHostFlag
+	if *destPortFlag != 443 {
+		newURL = newURL + fmt.Sprintf(":%v", *destPortFlag)
+	}
+	newURL = newURL + r.URL.Path
+	if r.URL.RawQuery != "" {
+		newURL = newURL + "?" + r.URL.RawQuery
+	}
 
+	fmt.Println(newURL)
 	var (
 		err     error
 		newReq  *http.Request
@@ -100,16 +108,23 @@ func proxy(w http.ResponseWriter, r *http.Request) {
 
 	client := &http.Client{Transport: tr}
 
+	reqDumped := dumpRequest(newReq)
+
 	newResp, err = client.Do(newReq)
+	dumpResponse(reqDumped, newResp)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprintf(w, "Error: %s!", err.Error())
+		fmt.Println(err.Error())
 		return
 	}
+
 	copyHeaders(w.Header(), newResp.Header)
 	w.WriteHeader(newResp.StatusCode)
 	io.Copy(w, newResp.Body)
 	newResp.Body.Close()
+
 }
 
 func loadX509KeyPair(certFile, keyFile, pw string) (cert tls.Certificate, err error) {
