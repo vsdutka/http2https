@@ -47,3 +47,6 @@ Temporary Items
 .apdisk
 *.pem
 http2https.exe~
+log/
+*.cmd
+*.exe
