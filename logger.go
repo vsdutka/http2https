@@ -36,7 +36,7 @@ var basePath string
 
 func init() {
 	go func() {
-		const fmtFileName = "${app_path}\\log\\ex${date}.log"
+		const fmtFileName = "${app_path}/log/ex${date}.log"
 		var (
 			lastLogging = time.Time{}
 			logFile     *os.File
